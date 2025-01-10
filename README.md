@@ -35,3 +35,84 @@ Testing
 At the end of the configuration
 - You should be able to remotely login to Router using SSH.
 - You should be able to browse www.salsabil.net using web browser from any User PC.
+
+
+Solutions : 
+------------
+
+## Router Configuration Steps
+
+1. **Router Hostname Configuration:**
+   ```
+   hostname SM
+   ```
+
+2. **Secure the device:**
+   - Set an encrypted password for privileged EXEC mode:
+     ```
+     enable secret enpa$$word
+     ```
+
+   - Secure all access methods with passwords:
+     ```
+     line console 0
+     password smpa$$word
+     login
+
+     line vty 0 4
+     password smpa$$word
+     login
+     ```
+
+   - Prevent passwords from being displayed in clear text:
+     ```
+     service password-encryption
+     ```
+
+3. **IP Domain and SSH Configuration:**
+   - Set the IP domain name:
+     ```
+     ip domain-name sm.net
+     ```
+
+   - Generate SSH keys and configure SSH version 2:
+     ```
+     crypto key generate rsa
+     modulus 1024
+     ip ssh version 2
+     ip ssh time-out 60
+     ip ssh authentication-retries 5
+     ```
+
+   - Create a local user for SSH login:
+     ```
+     username admin secret adminpa$$
+     ```
+
+4. **Gigabit Ethernet Interfaces Configuration:**
+   - **User LAN Interface:**
+     ```
+     interface GigabitEthernet0/0
+     ip address <User LAN Gateway IP> <Subnet Mask>
+     description User LAN
+     no shutdown
+     ```
+
+   - **Server LAN Interface:**
+     ```
+     interface GigabitEthernet0/1
+     ip address <Server LAN Gateway IP> <Subnet Mask>
+     description Server LAN
+     no shutdown
+     ```
+
+5. **Backup Configuration to TFTP Server:**
+   ```
+   copy running-config tftp
+   ```
+6. **Enable DNS Service:**
+
+Ensure the DNS service is running on the DNS and TFTP Server.
+
+Add an entry in the DNS server for www.salsabil.net with the corresponding IP address of the web server.
+
